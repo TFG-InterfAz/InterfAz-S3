@@ -2,15 +2,23 @@ from django.shortcuts import render,get_object_or_404
 from .form import Generated_Html_Form
 from .models import Generated_Html
 from django.db.models import Q
-
 import bleach
-
-# Create your views here.
-# views.py
 from django.shortcuts import render, redirect
 from .form import Generated_Html_Form
 from .models import Generated_Html
 import re
+from rest_framework import viewsets
+from .serializer import Generated_HtmlSerializer
+
+
+
+
+class RenderizerView(viewsets.ModelViewSet):
+    serializer_class = Generated_HtmlSerializer
+    queryset = Generated_Html.objects.all()
+
+
+
 
 def normalize_inline_scripts(html_code):
     pattern = re.compile(
