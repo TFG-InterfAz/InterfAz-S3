@@ -15,14 +15,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
 from starcoder import views
 from ollama import views as ollamaViews
 from html_renderizer import views as htmlViews
 
 from .views import home
+from .views import axios_connection
+from .views import get_csrf_token
+from rest_framework import routers
+from rest_framework.documentation import include_docs_urls
+
+router = routers.DefaultRouter()
+router.register(f'Renderizer', htmlViews.RenderizerView, 'Renderizer')
 
 urlpatterns = [
+    #API for forntend 
+    path('api/v1/', include(router.urls)),
+    path('docs/', include_docs_urls(title="Renderizer API")),
+    #URL from Djgango's templates
     path('admin/', admin.site.urls),
     path("ask/starcoder", views.prompt_view, name="prompt_view"),
     path('prompts/starcoder', views.show_prompts, name='show_prompts'),
@@ -34,6 +45,10 @@ urlpatterns = [
     path('get_all_html/', htmlViews.get_all_html, name='show_all_html'),
     path('modify_html/<int:html_id>/', htmlViews.modify_html, name='modify_html'),
     path('delete_html/<int:html_id>/', htmlViews.delete_html, name='delete_html'),
+    path('axios_connection', axios_connection, name='connection'),
+    path('get_csrf/', get_csrf_token),
+
+
 
 
 
