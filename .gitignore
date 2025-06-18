@@ -2,7 +2,6 @@
 myvenv/
 venv/
 
-InterfAz/settings.py
 *.sarif
 
 # Archivos bytecode de Python
