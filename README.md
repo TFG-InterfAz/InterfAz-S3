@@ -156,11 +156,13 @@ Make sure middleware includes:
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Authors
 
 **Your Name**  
 Project for Academic Use  
 GitHub: [ivaramlar](https://github.com/ivaramlar)
+GitHub: [fracalrod3](https://github.com/fracalrod3)
+
 
 ---
 
