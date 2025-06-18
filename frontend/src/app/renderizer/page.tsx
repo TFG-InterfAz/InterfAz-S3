@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles.css';
+import { useRouter } from 'next/navigation';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
@@ -19,6 +20,7 @@ interface RenderInstance {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [instances, setInstances] = useState<RenderInstance[]>([]);
   const [filteredInstances, setFilteredInstances] = useState<RenderInstance[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,6 +114,7 @@ export default function Home() {
       <header className="home-header">
         <div className="header-content">
           <Image
+            onClick={()=>{router.push('/');}}
             className="logo"
             src="/logo-interfaz.svg"
             alt="interfaz.js logo"

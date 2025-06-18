@@ -242,6 +242,53 @@
 
 .logo {
   margin-bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.main-form-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 20px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+}
+
+/* Mantén este para el header del formulario (no el contenedor principal) */
+.form-header-inner {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.logo-clickable {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 50;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo-clickable:hover {
+  transform: scale(1.05);
+}
+
+.form-wrapper {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 40px; /* Espacio para el logo */
 }
 
 .page-title {
