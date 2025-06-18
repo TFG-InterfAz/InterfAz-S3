@@ -5,6 +5,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
 import '../../styles.css';
+import Image from "next/image";
+
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
@@ -46,11 +48,23 @@ export default function VolunteerForm() {
   };
 
   return (
-    <div className='app-container'>
+    <div className='main-form-container'>
       <ToastContainer />
+      {/* Header */}
+      <Image
+        onClick={() => { router.push('/'); }}
+        className="logo-clickable"
+        src="/logo-interfaz.svg"
+        alt="interfaz.js logo"
+        width={280}
+        height={58}
+        priority
+      />
+
+      {/* Create Section */}
       <div className='form-wrapper'>
         <form onSubmit={handleSubmit} className='volunteer-form'>
-          <div className='form-header'>
+          <div className='form-header-inner'>
             <h2 className='form-title'>Instance Creation</h2>
             <p className='form-description'>Please fill this form in order to create a new instance</p>
           </div>
