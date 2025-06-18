@@ -19,12 +19,16 @@ from django.urls import path,include
 from starcoder import views
 from ollama import views as ollamaViews
 from html_renderizer import views as htmlViews
+from authentification import views as authViews
+
 
 from .views import home
 from .views import axios_connection
 from .views import get_csrf_token
 from rest_framework import routers
 from rest_framework.documentation import include_docs_urls
+from rest_framework_simplejwt import views as jwt_views
+
 
 router = routers.DefaultRouter()
 router.register(f'Renderizer', htmlViews.RenderizerView, 'Renderizer')
@@ -47,6 +51,14 @@ urlpatterns = [
     path('delete_html/<int:html_id>/', htmlViews.delete_html, name='delete_html'),
     path('axios_connection', axios_connection, name='connection'),
     path('get_csrf/', get_csrf_token),
+    
+    #URL Login
+    path('token/', jwt_views.TokenObtainPairView.as_view(), name ='token_obtain_pair'),
+    path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name ='token_refresh'),
+    path('home/', authViews.HomeView.as_view(), name ='home'),
+    path('logout/', authViews.LogoutView.as_view(), name ='logout'),
+
+
 
 
 
