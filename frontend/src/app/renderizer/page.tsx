@@ -7,7 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles.css';
 import { useRouter } from 'next/navigation';
-
+import UpdateForm from "./update/[id]/page";
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
 interface RenderInstance {
@@ -28,6 +28,20 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState('');
 
   const availableModels = ['OPENAI', 'Ollama', 'Claude', 'DeepSeek', 'Cursor'];
+
+  const MODEL_TUPLES: [string, string][] = [
+    ["OPENAI", "OP"],
+    ["Ollama", "OL"],
+    ["Claude", "CE"],
+    ["DeepSeek", "DK"],
+    ["Cursor", "CS"],
+    ["StarCoder", "SC"],
+    ["Unknown", "UN"]
+  ];
+  const getAbbreviation = (fullName: string): string => {
+    const found = MODEL_TUPLES.find(([name]) => name === fullName);
+    return found ? found[1] : fullName; // Si no se encuentra, devolver el original
+  };
 
   useEffect(() => {
     fetchInstances();
@@ -50,6 +64,16 @@ export default function Home() {
     }
   };
 
+  const handleDelete = async (id_instance: number) => {
+    try {
+      await axios.delete(`${API_ENDPOINT}Renderizer/${id_instance}/`);
+      toast.success('Instance deleted');
+      location.reload();
+    } catch {
+      toast.error('delete  failed');
+    } 
+  };
+
   const filterInstances = () => {
     let filtered = [...instances];
 
@@ -61,7 +85,8 @@ export default function Home() {
     }
 
     if (selectedModel) {
-      filtered = filtered.filter(instance => instance.ai === selectedModel);
+      const modelAbbreviation = getAbbreviation(selectedModel);
+      filtered = filtered.filter(instance => instance.ai === modelAbbreviation);
     }
 
     setFilteredInstances(filtered);
@@ -114,7 +139,7 @@ export default function Home() {
       <header className="home-header">
         <div className="header-content">
           <Image
-            onClick={()=>{router.push('/');}}
+            onClick={() => { router.push('/'); }}
             className="logo"
             src="/logo-interfaz.svg"
             alt="interfaz.js logo"
@@ -217,6 +242,21 @@ export default function Home() {
                       title="Copy HTML Code"
                     >
                       📋 Copy
+                    </button>
+                    <button
+                      onClick={() => router.push(`/renderizer/update/${instance.id}`)}
+                      className="copy-btn"
+                      title="Update Instance"
+                    >
+                      ✏️ Update
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(instance.id)}
+                      className="copy-btn"
+                      title="Copy HTML Code"
+                    >
+                      🗑️ Delete
                     </button>
                   </div>
                 </div>

@@ -10,7 +10,7 @@ import Image from "next/image";
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
-export default function VolunteerForm() {
+export default function CreateForm() {
   const router = useRouter();
 
   const [title, setTitle] = useState('');
