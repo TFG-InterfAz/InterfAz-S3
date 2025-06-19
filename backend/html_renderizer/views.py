@@ -9,6 +9,8 @@ from .models import Generated_Html
 import re
 from rest_framework import viewsets
 from .serializer import Generated_HtmlSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 
 
 
@@ -16,6 +18,12 @@ from .serializer import Generated_HtmlSerializer
 class RenderizerView(viewsets.ModelViewSet):
     serializer_class = Generated_HtmlSerializer
     queryset = Generated_Html.objects.all()
+    def get_permissions(self):
+        if self.action == 'list':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+
 
 
 

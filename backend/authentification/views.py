@@ -25,3 +25,12 @@ class LogoutView(APIView):
                return Response(status=status.HTTP_205_RESET_CONTENT)
           except Exception as e:
                return Response(status=status.HTTP_400_BAD_REQUEST)
+          
+
+class PrivateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({
+            "message": f" Hello, {request.user.username}. Welcome to your private area"
+        })

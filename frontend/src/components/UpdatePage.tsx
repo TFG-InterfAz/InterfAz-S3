@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../app/lib/api';
 import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,12 +22,22 @@ export default function UpdatePage({ id }: Props) {
     ai: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showForm, setShowForm] = useState(true);
+  
 
   useEffect(() => {
+    const token = localStorage.getItem("access_token");
+        if (!token) {
+          toast.error("You must be logged in to view this page.");
+          setShowForm(false)
+          setTimeout(() => {
+            router.push("/authentication/login");
+          }, 5000);
+        }
     const fetchInstance = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${API_ENDPOINT}Renderizer/${id}/`);
+        const response = await api.get(`/api/v1/Renderizer/${id}/`);
         setFormData(response.data);
       } catch {
         toast.error('Failed to load instance data');
@@ -74,7 +84,7 @@ export default function UpdatePage({ id }: Props) {
         height={58}
         priority
       />
-
+      {showForm && (
       <div className='form-wrapper'>
         <form onSubmit={handleSubmit} className='volunteer-form'>
           <div className='form-header-inner'>
@@ -146,6 +156,7 @@ export default function UpdatePage({ id }: Props) {
           </button>
         </form>
       </div>
+      )}
     </div>
   );
 }

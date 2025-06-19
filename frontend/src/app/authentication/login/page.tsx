@@ -1,10 +1,11 @@
 "use client";
-import axios from "axios";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from 'react-toastify';
 import Image from "next/image";
 import '../../styles.css'
+import api from '../../lib/api';
+
 const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -14,6 +15,8 @@ const LoginPage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        if (!username) return toast.error('Username is mandatory');
+            if (!password) return toast.error('Password is mandatory');
 
         try {
             const response = await fetch('http://localhost:8000/token/', {
@@ -36,10 +39,10 @@ const LoginPage = () => {
             localStorage.setItem('refresh_token', data.refresh);
 
             // Configura el header de autorización por defecto
-            axios.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
+            api.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
 
             // Redirecciona
-            router.push('/');
+            router.push('/authentication/confirmation');
 
         } catch (err) {
             setError('Invalid credentials');
