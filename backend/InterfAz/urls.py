@@ -52,7 +52,7 @@ urlpatterns = [
     path('axios_connection', axios_connection, name='connection'),
     path('get_csrf/', get_csrf_token),
     
-    #URL Login
+    #URL Login and lOGOUT
     path('token/', jwt_views.TokenObtainPairView.as_view(), name ='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name ='token_refresh'),
     path('home/', authViews.HomeView.as_view(), name ='home'),
@@ -60,6 +60,8 @@ urlpatterns = [
     path('private/', authViews.PrivateView.as_view(), name='private'),
 
 
+    #User registration
+    path('signup/',authViews.SignupView.as_view(), name='auth_signup'),
 
 
 
