@@ -35,6 +35,17 @@ export default function Home() {
           <li className="mb-2 tracking-[-.01em]">
             <a
               className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold"
+              href = {`/authentication/register`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+            sign in
+
+            </a>
+          </li>
+          <li className="mb-2 tracking-[-.01em]">
+            <a
+              className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold"
               href = {`/renderizer/`}
               target="_blank"
               rel="noopener noreferrer"
