@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'coreapi',
+    'django_rest_passwordreset',
     'InterfAz',
     'trial',
     'starcoder',
