@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import '../../styles.css';
 import Image from "next/image";
 
-
 export default function CreateForm() {
   const router = useRouter();
 
@@ -17,17 +16,41 @@ export default function CreateForm() {
   const [ai, setAI] = useState('');
   const [showForm, setShowForm] = useState(true);
 
-
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) {
       toast.error("You must be logged in to view this page.");
-      setShowForm(false)
+      setShowForm(false);
       setTimeout(() => {
         router.push("/authentication/login");
       }, 5000);
     }
   }, []);
+
+  // ✅ New Gemini generator
+  const handleGenerateWithGemini = async () => {
+    if (!prompt) return toast.error("Prompt is mandatory");
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/gemini_query/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to connect to Gemini");
+      }
+
+      const data = await response.json();
+      setHtml_code(data.response || "");
+      toast.success("Code generated successfully from Gemini");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error generating code from Gemini");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -71,7 +94,7 @@ export default function CreateForm() {
         priority
       />
 
-      {showForm  && (
+      {showForm && (
         <div className='form-wrapper'>
           <form onSubmit={handleSubmit} className='volunteer-form'>
             <div className='form-header-inner'>
@@ -99,13 +122,20 @@ export default function CreateForm() {
                 rows={4}
                 onChange={(e) => setPrompt(e.target.value)}
               />
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={handleGenerateWithGemini}
+              >
+                Generate with Gemini
+              </button>
             </div>
 
             <div className='form-group'>
               <label className='form-label'>HTML Code</label>
               <textarea
                 value={html_code}
-                placeholder='Write your HTML code'
+                placeholder='Write your HTML code or generate it'
                 className='form-textarea code-textarea'
                 rows={6}
                 onChange={(e) => setHtml_code(e.target.value)}
@@ -123,8 +153,7 @@ export default function CreateForm() {
                 <option value="gpt-4">OPENAI</option>
                 <option value="gpt-3.5-turbo">Ollama</option>
                 <option value="claude">Claude</option>
-                <option value="gemini">DeepSeek</option>
-                <option value="gemini">Cursor</option>
+                <option value="gemini">Gemini</option>
               </select>
             </div>
 
@@ -133,9 +162,7 @@ export default function CreateForm() {
             </button>
           </form>
         </div>
-        )
-    }
+      )}
     </div>
-      
   );
 }
