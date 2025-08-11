@@ -9,6 +9,7 @@
     "start": "cross-env HOST=127.0.0.1 react-scripts start"
   },
   "dependencies": {
+    "@google/genai": "^1.13.0",
     "axios": "^1.11.0",
     "next": "15.3.3",
     "react": "^19.0.0",
