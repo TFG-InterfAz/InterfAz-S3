@@ -25,6 +25,7 @@ from authentification import views as authViews
 from .views import home
 from .views import axios_connection
 from .views import get_csrf_token
+from gemini import views as gemini_views
 from rest_framework import routers
 from rest_framework.documentation import include_docs_urls
 from rest_framework_simplejwt import views as jwt_views
@@ -63,6 +64,11 @@ urlpatterns = [
     #User registration
     path('signup/',authViews.SignupView.as_view(), name='auth_signup'),
     path('password/reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+
+    #Ask Gemini
+    path('api/gemini_query/', gemini_views.gemini_query, name='gemini_query'),
+
+
 
 
 

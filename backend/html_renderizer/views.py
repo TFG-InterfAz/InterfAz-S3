@@ -10,7 +10,12 @@ import re
 from rest_framework import viewsets
 from .serializer import Generated_HtmlSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+import os
+import json
+from django.http import StreamingHttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from dotenv import load_dotenv
+from google import genai
 
 
 
@@ -150,3 +155,31 @@ def delete_html(request, html_id):
         return redirect('show_all_html')  # Redirige a la lista después de borrar
 
     return render(request, "delete.html", {"html": html_instance})
+
+load_dotenv()
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+client = genai.Client(api_key=GOOGLE_API_KEY)
+
+@csrf_exempt
+def gemini_generate_code(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        prompt = data.get("prompt", "").strip()
+        if not prompt:
+            return JsonResponse({"error": "Prompt is required"}, status=400)
+
+        def generate():
+            for chunk in client.models.generate_content_stream(
+                model="gemini-2.5-flash",
+                contents=f"Generate valid HTML + JavaScript code based on the following prompt:\n{prompt}"
+            ):
+                if hasattr(chunk, "text") and chunk.text:
+                    yield chunk.text
+
+        return StreamingHttpResponse(generate(), content_type="text/plain")
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

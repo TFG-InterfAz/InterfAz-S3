@@ -274,21 +274,24 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="home-footer">
-        <div className="footer-content">
-          <div className="footer-links">
-            <a href="/renderizer" className="footer-link">
-              Create New Instance
-            </a>
-            <a href="https://github.com/TFG-InterfAz" target="_blank" rel="noopener noreferrer" className="footer-link">
-              GitHub
-            </a>
+        <footer className="home-footer">
+          <div className="footer-content">
+            <div className="footer-links">
+              <a href="/renderizer" className="footer-link">
+                Create New Instance
+              </a>
+              <a href="/gemini" className="footer-link">
+                Ask Gemini
+              </a>
+              <a href="https://github.com/TFG-InterfAz" target="_blank" rel="noopener noreferrer" className="footer-link">
+                GitHub
+              </a>
+            </div>
+            <p className="footer-text">
+              InterfAz - AI-powered HTML generation tool
+            </p>
           </div>
-          <p className="footer-text">
-            InterfAz - AI-powered HTML generation tool
-          </p>
-        </div>
-      </footer>
+        </footer>
     </div>
   );
 }
