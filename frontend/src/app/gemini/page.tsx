@@ -6,8 +6,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles.css';
 
-//const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
-const API_ENDPOINT = "http://localhost:8000/";
+const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
+//const API_ENDPOINT = "http://localhost:8000/";
 console.log("API_ENDPOINT:", API_ENDPOINT);
 
 export default function GeminiPage() {
