@@ -46,14 +46,14 @@ INSTALLED_APPS = [
     'starcoder',
     'ollama',
     'html_renderizer',
-    'corsheaders'
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'InterfAz.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'interfaz_db',
+        'NAME': 'interfaz',
         'USER': 'interfaz_user',
         'PASSWORD': 'interfaz_password',
         'HOST': 'localhost',
