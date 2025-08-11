@@ -55,7 +55,7 @@ export default function Home() {
             </a>
           </li>
           <li className="tracking-[-.01em]">
-            Ask ChatGPT.
+            Ask Gemini
           </li>
         </ol>
 

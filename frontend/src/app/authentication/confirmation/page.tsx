@@ -4,10 +4,11 @@ import api from '../../lib/api';
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from 'react-toastify';
 import Image from "next/image";
-import { Logout } from "../logout/page";
 
 const PrivatePage = () => {
     const [message, setMessage] = useState<string | null>(null);
+    const [geminiPrompt, setGeminiPrompt] = useState("");
+    const [geminiResponse, setGeminiResponse] = useState("");
     const router = useRouter();
     const [showContent, setShowContent] = useState(true);
 
@@ -18,14 +19,36 @@ const PrivatePage = () => {
                 setMessage(response.data.message);
             } catch (error) {
                 console.error("Access denied:", error);
-                setShowContent(false)
+                setShowContent(false);
                 toast.error("You must be logged in to view this page.");
-                setTimeout(function () { router.push("/authentication/login"); }, 5000);
+                setTimeout(function () {
+                    router.push("/authentication/login");
+                }, 5000);
             }
         };
-
         fetchPrivateData();
     }, []);
+
+    const handleAskGemini = async () => {
+        if (!geminiPrompt) {
+            toast.error("Please enter a prompt for Gemini");
+            return;
+        }
+        try {
+            const res = await fetch("/api/gemini_query/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: geminiPrompt }),
+            });
+            if (!res.ok) throw new Error("Failed to contact Gemini");
+            const data = await res.json();
+            setGeminiResponse(data.response);
+            toast.success("Gemini answered!");
+        } catch (err) {
+            console.error(err);
+            toast.error("Error asking Gemini");
+        }
+    };
 
     return (
         <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -49,7 +72,7 @@ const PrivatePage = () => {
                     <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
                         <li className="mb-2 tracking-[-.01em]">
                             <a
-                                className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold"
+                                className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold"
                                 href={`/authentication/logout`}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -59,20 +82,28 @@ const PrivatePage = () => {
                         </li>
                         <li className="mb-2 tracking-[-.01em]">
                             <a
-                                className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold"
+                                className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold"
                                 href={`/renderizer/`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
                                 Show all records
-
                             </a>
                         </li>
-                        <li className="tracking-[-.01em]">
-                            Ask ChatGPT.
+                        <li className="mb-2 tracking-[-.01em]">
+                            <a 
+                                className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold"
+                                href={`/gemini/`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Ask Gemini
+                            </a>
                         </li>
                     </ol>
-                    <div className="flex gap-4 items-center flex-col sm:flex-row">
+
+
+                    <div className="flex gap-4 items-center flex-col sm:flex-row mt-4">
                         <a
                             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
                             href={`/renderizer/create`}
@@ -96,12 +127,10 @@ const PrivatePage = () => {
                         >
                             GitHub
                         </a>
-
                     </div>
                 </>)}
             </main>
-            <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-            </footer>
+            <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center" />
         </div>
     );
 };
