@@ -6,6 +6,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from "next/image";
 import '../app/styles.css';
+import axios from 'axios';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
