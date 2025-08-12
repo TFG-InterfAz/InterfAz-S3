@@ -38,7 +38,7 @@ export default function UpdatePage({ id }: Props) {
     const fetchInstance = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get(`/api/v1/Renderizer/${id}/`);
+        const response = await api.get(`/api/v1/renderizer/${id}/`);
         setFormData(response.data);
       } catch {
         toast.error('Failed to load instance data');
@@ -58,7 +58,7 @@ export default function UpdatePage({ id }: Props) {
     }
     try {
       setIsLoading(true);
-      await axios.patch(`${API_ENDPOINT}Renderizer/${id}/`, formData);
+      await axios.patch(`${API_ENDPOINT}api/v1/renderizer/${id}/`, formData);
       toast.success('Instance updated');
       router.push('/renderizer');
     } catch {

@@ -32,12 +32,12 @@ from rest_framework_simplejwt import views as jwt_views
 
 
 router = routers.DefaultRouter()
-router.register(f'Renderizer', htmlViews.RenderizerView, 'Renderizer')
+router.register(f'renderizer', htmlViews.RenderizerView, 'renderizer')
 
 urlpatterns = [
     #API for forntend 
     path('api/v1/', include(router.urls)),
-    path('docs/', include_docs_urls(title="Renderizer API")),
+    path('docs/', include_docs_urls(title="renderizer API")),
     #URL from Djgango's templates
     path('admin/', admin.site.urls),
     path("ask/starcoder", views.prompt_view, name="prompt_view"),

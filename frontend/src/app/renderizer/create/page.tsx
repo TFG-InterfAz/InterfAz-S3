@@ -66,7 +66,7 @@ export default function CreateForm() {
     RenderizerData.append('model', ai);
 
     try {
-      await api.post("/api/v1/Renderizer/", RenderizerData);
+      await api.post("/api/v1/renderizer/", RenderizerData);
       toast.success('Instance created successfully');
       router.push('/renderizer');
     } catch (error: any) {
