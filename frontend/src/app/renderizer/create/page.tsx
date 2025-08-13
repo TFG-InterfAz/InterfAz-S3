@@ -37,7 +37,7 @@ export default function CreateForm() {
 
     if (storedPrompt) setPrompt(storedPrompt);
     if (storedHtml) setHtml_code(extractHtml(storedHtml));
-    if (storedPrompt || storedHtml) setAI('gemini');
+    if (storedPrompt || storedHtml) setAI('GE');
 
     // Limpiamos localStorage
     if (storedPrompt) localStorage.removeItem('renderizer_prompt');
@@ -62,7 +62,7 @@ export default function CreateForm() {
       const data = await response.json();
       const htmlOnly = extractHtml(data.response || "");
       setHtml_code(htmlOnly);
-      setAI('gemini');
+      setAI('GE');
       toast.success("Code generated successfully from Gemini");
     } catch (err) {
       console.error(err);
@@ -81,8 +81,9 @@ export default function CreateForm() {
     const RenderizerData = new FormData();
     RenderizerData.append('title', title);
     RenderizerData.append('prompt', prompt);
-    RenderizerData.append('code', html_code);
-    RenderizerData.append('model', ai);
+    RenderizerData.append('html_code', html_code);
+    RenderizerData.append('ai', ai);
+
 
     try {
       await api.post("/api/v1/renderizer/", RenderizerData);
@@ -170,10 +171,13 @@ export default function CreateForm() {
                 onChange={(e) => setAI(e.target.value)}
               >
                 <option value="">Select an AI model</option>
-                <option value="gpt-4">OPENAI</option>
-                <option value="gpt-3.5-turbo">Ollama</option>
-                <option value="claude">Claude</option>
-                <option value="gemini">Gemini</option>
+                <option value="OP">OPENAI</option>
+                <option value="OL">Ollama</option>
+                <option value="CE">Claude</option>
+                <option value="GE">Gemini</option>
+                <option value="DK">DeepSeek</option>
+                <option value="CS">Cursor</option>
+                <option value="SC">StarCoder</option>
               </select>
             </div>
 
