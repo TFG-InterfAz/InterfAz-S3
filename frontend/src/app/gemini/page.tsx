@@ -101,6 +101,18 @@ export default function GeminiPage() {
               className="form-textarea code-textarea"
               rows={8}
             />
+            <button
+              className="submit-button"
+              style={{ marginTop: '10px', width: '50%', marginLeft: '25%', marginRight: '25%' }}
+              >
+              <a
+                href={`/renderizer/create`}
+                target="_blank"
+                rel="noopener noreferrer"
+                >
+                Renderize now
+              </a>
+            </button>
           </div>
         )}
       </div>
