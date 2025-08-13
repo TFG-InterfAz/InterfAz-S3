@@ -27,13 +27,14 @@ export default function Home() {
   const [searchText, setSearchText] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
 
-  const availableModels = ['OPENAI', 'Ollama', 'Claude', 'DeepSeek', 'Cursor'];
+  const availableModels = ['OPENAI', 'Ollama', 'Claude', 'DeepSeek', 'Gemini', 'Cursor'];
 
   const MODEL_TUPLES: [string, string][] = [
     ["OPENAI", "OP"],
     ["Ollama", "OL"],
     ["Claude", "CE"],
     ["DeepSeek", "DK"],
+    ["Gemini", "GE"],
     ["Cursor", "CS"],
     ["StarCoder", "SC"],
     ["Unknown", "UN"]
@@ -54,7 +55,7 @@ export default function Home() {
   const fetchInstances = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_ENDPOINT}Renderizer/`);
+      const response = await axios.get(`${API_ENDPOINT}api/v1/renderizer/`);
       setInstances(response.data);
     } catch (error) {
       console.error('Error fetching instances:', error);
@@ -66,7 +67,7 @@ export default function Home() {
 
   const handleDelete = async (id_instance: number) => {
     try {
-      await axios.delete(`${API_ENDPOINT}Renderizer/${id_instance}/`);
+      await axios.delete(`${API_ENDPOINT}api/v1/renderizer/${id_instance}/`);
       toast.success('Instance deleted');
       location.reload();
     } catch {

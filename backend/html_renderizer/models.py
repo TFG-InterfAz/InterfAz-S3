@@ -11,13 +11,14 @@ class Generated_Html(models.Model):
         STARCODER = "SC",  _("StarCoder")
         OLLAMA = "OL",  _("Ollama")
         OPENAI = "OP",  _("OPENAI")
+        GEMINI = "GE",  _("Gemini")
         DEEPSEEK = "DK",  _("DeepSeek")
         CURSOR = "CS",  _("Cursor")
         CLAUDE = "CE",  _("Claude")
         UNKNOWN = "UN",  _("Unknown")
 
-    
-    ai = models.CharField(max_length=2, 
+    ai = models.CharField(
+        max_length=2,
         choices = AI_selector.choices,
         default = AI_selector.UNKNOWN,
     )

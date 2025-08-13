@@ -16,6 +16,12 @@ export default function CreateForm() {
   const [ai, setAI] = useState('');
   const [showForm, setShowForm] = useState(true);
 
+  // Extraemos HTML desde los bloques ```html
+  const extractHtml = (text: string) => {
+    const match = text.match(/```html\s*([\s\S]*?)```/);
+    return match ? match[1] : text;
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -25,9 +31,20 @@ export default function CreateForm() {
         router.push("/authentication/login");
       }, 5000);
     }
+
+    const storedPrompt = localStorage.getItem('renderizer_prompt');
+    const storedHtml = localStorage.getItem('renderizer_html');
+
+    if (storedPrompt) setPrompt(storedPrompt);
+    if (storedHtml) setHtml_code(extractHtml(storedHtml));
+    if (storedPrompt || storedHtml) setAI('GE');
+
+    // Limpiamos localStorage
+    if (storedPrompt) localStorage.removeItem('renderizer_prompt');
+    if (storedHtml) localStorage.removeItem('renderizer_html');
   }, []);
 
-  // ✅ New Gemini generator
+  // Generamos código con Gemini
   const handleGenerateWithGemini = async () => {
     if (!prompt) return toast.error("Prompt is mandatory");
 
@@ -43,7 +60,9 @@ export default function CreateForm() {
       }
 
       const data = await response.json();
-      setHtml_code(data.response || "");
+      const htmlOnly = extractHtml(data.response || "");
+      setHtml_code(htmlOnly);
+      setAI('GE');
       toast.success("Code generated successfully from Gemini");
     } catch (err) {
       console.error(err);
@@ -62,11 +81,12 @@ export default function CreateForm() {
     const RenderizerData = new FormData();
     RenderizerData.append('title', title);
     RenderizerData.append('prompt', prompt);
-    RenderizerData.append('code', html_code);
-    RenderizerData.append('model', ai);
+    RenderizerData.append('html_code', html_code);
+    RenderizerData.append('ai', ai);
+
 
     try {
-      await api.post("/api/v1/Renderizer/", RenderizerData);
+      await api.post("/api/v1/renderizer/", RenderizerData);
       toast.success('Instance created successfully');
       router.push('/renderizer');
     } catch (error: any) {
@@ -124,7 +144,8 @@ export default function CreateForm() {
               />
               <button
                 type="button"
-                className="secondary-button"
+                className="submit-button"
+                style={{ marginTop: '10px', width: '50%', marginLeft: '25%', marginRight: '25%' }}
                 onClick={handleGenerateWithGemini}
               >
                 Generate with Gemini
@@ -150,10 +171,13 @@ export default function CreateForm() {
                 onChange={(e) => setAI(e.target.value)}
               >
                 <option value="">Select an AI model</option>
-                <option value="gpt-4">OPENAI</option>
-                <option value="gpt-3.5-turbo">Ollama</option>
-                <option value="claude">Claude</option>
-                <option value="gemini">Gemini</option>
+                <option value="OP">OPENAI</option>
+                <option value="OL">Ollama</option>
+                <option value="CE">Claude</option>
+                <option value="GE">Gemini</option>
+                <option value="DK">DeepSeek</option>
+                <option value="CS">Cursor</option>
+                <option value="SC">StarCoder</option>
               </select>
             </div>
 
