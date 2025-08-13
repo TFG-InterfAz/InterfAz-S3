@@ -134,7 +134,6 @@ def get_all_html(request):
         )
 
     if ai_filter:
-        # accept "Gemini" or "GE"
         name_to_abbrev = {
             "OPENAI": "OP",
             "Ollama": "OL",

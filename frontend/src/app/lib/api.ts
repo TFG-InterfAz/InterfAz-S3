@@ -1,12 +1,10 @@
 "use client";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-const API_ENDPOINT = process.env.NEXT_AUTHENTICATION_API_ENDPOINT;
 
+const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT || "http://127.0.0.1:8000";
 
-// Configuración base de axios
 const api = axios.create({
-  baseURL: API_ENDPOINT || "http://127.0.0.1:8000",
+  baseURL: API_ENDPOINT,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -16,14 +14,24 @@ const api = axios.create({
 let isRefreshing = false;
 let failedRequestsQueue: any[] = [];
 
-// Interceptor de respuesta
+// Request interceptor: attach token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor: refresh token on 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const router = useRouter();
     const originalRequest = error.config;
 
-    // Solo manejar errores 401 (No autorizado)
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -41,34 +49,33 @@ api.interceptors.response.use(
 
       const refreshToken = localStorage.getItem("refresh_token");
       if (!refreshToken) {
-        router.push("/login");
         return Promise.reject(error);
       }
 
       try {
-        const response = await api.post("token/refresh/", {
+        const response = await axios.post(`${API_ENDPOINT}token/refresh/`, {
           refresh: refreshToken,
         });
 
         const { access, refresh: newRefresh } = response.data;
 
         localStorage.setItem("access_token", access);
-        localStorage.setItem("refresh_token", newRefresh);
+        if (newRefresh) {
+          localStorage.setItem("refresh_token", newRefresh);
+        }
+
         api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
         originalRequest.headers["Authorization"] = `Bearer ${access}`;
 
-        // Reprocesar todas las solicitudes en cola
         failedRequestsQueue.forEach(({ resolve }) => resolve(access));
         failedRequestsQueue = [];
 
         return api(originalRequest);
       } catch (refreshError) {
-        // Si el refresh falla, redirigir a login
         failedRequestsQueue.forEach(({ reject }) => reject(refreshError));
         failedRequestsQueue = [];
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        router.push("/login");
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -77,18 +84,6 @@ api.interceptors.response.use(
 
     return Promise.reject(error);
   }
-);
-
-// Interceptor de solicitud para agregar el token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
 );
 
 export default api;
