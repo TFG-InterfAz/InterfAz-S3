@@ -16,6 +16,12 @@ export default function CreateForm() {
   const [ai, setAI] = useState('');
   const [showForm, setShowForm] = useState(true);
 
+  // Extraemos HTML desde los bloques ```html
+  const extractHtml = (text: string) => {
+    const match = text.match(/```html\s*([\s\S]*?)```/);
+    return match ? match[1] : text;
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -25,22 +31,20 @@ export default function CreateForm() {
         router.push("/authentication/login");
       }, 5000);
     }
+
     const storedPrompt = localStorage.getItem('renderizer_prompt');
     const storedHtml = localStorage.getItem('renderizer_html');
 
-    if (storedPrompt && storedHtml) {
-      // Sólo se poblará si el usuario no lo ha hecho previamente
-      setPrompt((prev) => prev || storedPrompt);
-      setHtml_code((prev) => prev || storedHtml);
-      setAI((prev) => prev || 'gemini');
+    if (storedPrompt) setPrompt(storedPrompt);
+    if (storedHtml) setHtml_code(extractHtml(storedHtml));
+    if (storedPrompt || storedHtml) setAI('gemini');
 
-      // Limpiamos localStorage para que no persista
-      localStorage.removeItem('renderizer_prompt');
-      localStorage.removeItem('renderizer_html');
-    }
+    // Limpiamos localStorage
+    if (storedPrompt) localStorage.removeItem('renderizer_prompt');
+    if (storedHtml) localStorage.removeItem('renderizer_html');
   }, []);
 
-  // Generador de Gemini
+  // Generamos código con Gemini
   const handleGenerateWithGemini = async () => {
     if (!prompt) return toast.error("Prompt is mandatory");
 
@@ -56,7 +60,9 @@ export default function CreateForm() {
       }
 
       const data = await response.json();
-      setHtml_code(data.response || "");
+      const htmlOnly = extractHtml(data.response || "");
+      setHtml_code(htmlOnly);
+      setAI('gemini');
       toast.success("Code generated successfully from Gemini");
     } catch (err) {
       console.error(err);
@@ -137,7 +143,8 @@ export default function CreateForm() {
               />
               <button
                 type="button"
-                className="secondary-button"
+                className="submit-button"
+                style={{ marginTop: '10px', width: '50%', marginLeft: '25%', marginRight: '25%' }}
                 onClick={handleGenerateWithGemini}
               >
                 Generate with Gemini

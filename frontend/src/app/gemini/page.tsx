@@ -107,7 +107,13 @@ export default function GeminiPage() {
               onClick={() => {
                 // guardamos los valores exclusivamente al hacer clic
                 localStorage.setItem('renderizer_prompt', query);
-                localStorage.setItem('renderizer_html', response);
+                const htmlMatch = response.match(/```html([\s\S]*?)```/);
+                if (htmlMatch) {
+                  localStorage.setItem('renderizer_html', htmlMatch[1].trim());
+                } else {
+                  // guardamos todo si no hay bloque ```html```
+                  localStorage.setItem('renderizer_html', response);
+                }              
               }}
             >
               <a
