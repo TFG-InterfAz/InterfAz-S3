@@ -25,6 +25,19 @@ export default function CreateForm() {
         router.push("/authentication/login");
       }, 5000);
     }
+    const storedPrompt = localStorage.getItem('renderizer_prompt');
+    const storedHtml = localStorage.getItem('renderizer_html');
+
+    if (storedPrompt && storedHtml) {
+      // Sólo se poblará si el usuario no lo ha hecho previamente
+      setPrompt((prev) => prev || storedPrompt);
+      setHtml_code((prev) => prev || storedHtml);
+      setAI((prev) => prev || 'gemini');
+
+      // Limpiamos localStorage para que no persista
+      localStorage.removeItem('renderizer_prompt');
+      localStorage.removeItem('renderizer_html');
+    }
   }, []);
 
   // Generador de Gemini

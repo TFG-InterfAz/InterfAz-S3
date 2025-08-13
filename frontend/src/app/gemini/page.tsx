@@ -104,12 +104,17 @@ export default function GeminiPage() {
             <button
               className="submit-button"
               style={{ marginTop: '10px', width: '50%', marginLeft: '25%', marginRight: '25%' }}
-              >
+              onClick={() => {
+                // guardamos los valores exclusivamente al hacer clic
+                localStorage.setItem('renderizer_prompt', query);
+                localStorage.setItem('renderizer_html', response);
+              }}
+            >
               <a
                 href={`/renderizer/create`}
                 target="_blank"
                 rel="noopener noreferrer"
-                >
+              >
                 Renderize now
               </a>
             </button>
