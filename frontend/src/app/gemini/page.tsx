@@ -15,7 +15,7 @@ export default function GeminiPage() {
   const [loading, setLoading] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
 
-  // Check login on mount
+  // Comprobamos login
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (!token) {

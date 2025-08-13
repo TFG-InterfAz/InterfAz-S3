@@ -30,14 +30,14 @@ export default function UpdatePage({ id }: Props) {
       setTimeout(() => {
         router.push("/authentication/login");
       }, 5000);
-      return; // stop here if not logged in
+      return; // Acaba el proceso de no ser usuario registrado
     }
 
     const fetchInstance = async () => {
       try {
         setIsLoading(true);
         const response = await api.get(`/api/v1/renderizer/${id}/`);
-        // Prevent null values from breaking controlled inputs
+        // Evitamos null para no romper los inputs
         setFormData({
           title: response.data.title ?? '',
           prompt: response.data.prompt ?? '',

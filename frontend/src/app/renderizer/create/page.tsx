@@ -27,7 +27,7 @@ export default function CreateForm() {
     }
   }, []);
 
-  // ✅ New Gemini generator
+  // Generador de Gemini
   const handleGenerateWithGemini = async () => {
     if (!prompt) return toast.error("Prompt is mandatory");
 

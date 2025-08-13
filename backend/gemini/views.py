@@ -3,15 +3,15 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from dotenv import load_dotenv
-import google.generativeai as genai  # ✅ Correct import
+import google.generativeai as genai
 
-# Load environment variables from .env
+# Cargamos variables de .env
 load_dotenv()
 
-# Get the Gemini API key
+# token para la API de Gemini
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 
-# Configure Gemini client
+# Configuramos el cliente de Gemini
 genai.configure(api_key=GEMINI_API_KEY)
 
 @csrf_exempt
@@ -26,8 +26,8 @@ def gemini_query(request):
         if not prompt.strip():
             return JsonResponse({"error": "Prompt cannot be empty"}, status=400)
 
-        # Send prompt to Gemini model
-        model = genai.GenerativeModel("gemini-1.5-flash")  # You can change to "gemini-pro"
+        # Enviamos prompt a Gemini
+        model = genai.GenerativeModel("gemini-1.5-flash")
         result = model.generate_content(prompt)
 
         return JsonResponse({"response": result.text})
