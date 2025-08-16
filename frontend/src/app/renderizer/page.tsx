@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../styles.css';
 import { useRouter } from 'next/navigation';
 import UpdateForm from "./update/[id]/page";
+import BackButton from "@/components/BackButton";
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
 interface RenderInstance {
@@ -293,6 +294,8 @@ export default function Home() {
             </p>
           </div>
         </footer>
+        {/* Para volver a la página anterior */}
+        <BackButton />
     </div>
   );
 }
