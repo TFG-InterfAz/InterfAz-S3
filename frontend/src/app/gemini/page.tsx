@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles.css';
+import BackButton from '@/components/BackButton';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
@@ -127,6 +128,8 @@ export default function GeminiPage() {
           </div>
         )}
       </div>
+      {/* Para volver a la página anterior */}
+      <BackButton />
     </div>
   );
 }
