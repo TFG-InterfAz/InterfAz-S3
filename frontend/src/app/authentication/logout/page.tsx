@@ -2,14 +2,12 @@
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BackButton from "../../../components/BackButton";
 
-export default function LogoutButton() {
+export default function LogoutPage() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const confirmLogout = window.confirm("Are you sure you want to log out?");
-    if (!confirmLogout) return;
-
     try {
       const access = localStorage.getItem("access_token");
       const refresh = localStorage.getItem("refresh_token");
@@ -37,18 +35,22 @@ export default function LogoutButton() {
   };
 
   return (
-    <button
-      onClick={handleLogout}
-      className="flex items-center gap-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200 font-medium shadow hover:shadow-md"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          fillRule="evenodd"
-          d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-          clipRule="evenodd"
-        />
-      </svg>
-      Close session
-    </button>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-center">
+      <h1 className="text-4xl font-bold text-white mb-8">
+        Are you sure you want to log out?
+      </h1>
+
+      <button
+        onClick={handleLogout}
+        className="px-10 py-4 text-2xl font-bold text-white rounded-lg shadow-lg 
+                   bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 
+                   animate-pulse hover:scale-105 transform transition-all duration-200"
+      >
+        Log Out
+      </button>
+
+      {/* Para volver a la página anterior */}
+      <BackButton />
+    </div>
   );
 }

@@ -1,31 +1,51 @@
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .form import Generated_Html_Form
 from .models import Generated_Html
 from django.db.models import Q
 import bleach
-from django.shortcuts import render, redirect
-from .form import Generated_Html_Form
-from .models import Generated_Html
 import re
 from rest_framework import viewsets
 from .serializer import Generated_HtmlSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import os
+import json
+from django.http import StreamingHttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from dotenv import load_dotenv
+from google import genai
 
-
-
+# Load env and create client (keep as you had)
+load_dotenv()
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 
 class RenderizerView(viewsets.ModelViewSet):
     serializer_class = Generated_HtmlSerializer
-    queryset = Generated_Html.objects.all()
+
+    def get_queryset(self):
+        qs = Generated_Html.objects.all()
+        # accept either abbreviation (e.g. GE) or name (e.g. Gemini)
+        ai_filter = self.request.query_params.get('ai', '').strip()
+        if ai_filter:
+            # mapping full names to abbreviations
+            name_to_abbrev = {
+                "OPENAI": "OP",
+                "Ollama": "OL",
+                "Claude": "CE",
+                "Gemini": "GE",
+                "DeepSeek": "DK",
+                "Cursor": "CS",
+                "StarCoder": "SC"
+            }
+            ai_value = name_to_abbrev.get(ai_filter, ai_filter)  # fallback to given
+            qs = qs.filter(ai__iexact=ai_value)
+        return qs
+
     def get_permissions(self):
         if self.action == 'list':
             return [AllowAny()]
         return [IsAuthenticated()]
-    
-
-
-
 
 
 def normalize_inline_scripts(html_code):
@@ -114,7 +134,16 @@ def get_all_html(request):
         )
 
     if ai_filter:
-        qs = qs.filter(ai=ai_filter)
+        name_to_abbrev = {
+            "OPENAI": "OP",
+            "Ollama": "OL",
+            "Claude": "CE",
+            "Gemini": "GE",
+            "Cursor": "CS",
+            "StarCoder": "SC"
+        }
+        ai_value = name_to_abbrev.get(ai_filter, ai_filter)
+        qs = qs.filter(ai__iexact=ai_value)
 
     return render(request, "show_all_html.html", {
         "data":       qs.distinct(),
@@ -124,10 +153,7 @@ def get_all_html(request):
     })
 
 
-    
-
 def modify_html(request, html_id):
-     
     html = get_object_or_404(Generated_Html, id=html_id)
 
     if request.method == 'POST':
@@ -142,7 +168,6 @@ def modify_html(request, html_id):
 
 
 def delete_html(request, html_id):
-     
     html_instance = get_object_or_404(Generated_Html, id=html_id)
     
     if request.method == "POST":
@@ -150,3 +175,28 @@ def delete_html(request, html_id):
         return redirect('show_all_html')  # Redirige a la lista después de borrar
 
     return render(request, "delete.html", {"html": html_instance})
+
+
+@csrf_exempt
+def gemini_generate_code(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        prompt = data.get("prompt", "").strip()
+        if not prompt:
+            return JsonResponse({"error": "Prompt is required"}, status=400)
+
+        def generate():
+            for chunk in client.models.generate_content_stream(
+                model="gemini-2.5-flash",
+                contents=f"Generate valid HTML + JavaScript code based on the following prompt:\n{prompt}"
+            ):
+                if hasattr(chunk, "text") and chunk.text:
+                    yield chunk.text
+
+        return StreamingHttpResponse(generate(), content_type="text/plain")
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
