@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-export default function BackButton({ fallback = "/" }: { fallback?: string }) {
+export default function BackButton({ fallback = "/authentication/confirmation" }: { fallback?: string }) {
   const router = useRouter();
 
   const handleBack = () => {
