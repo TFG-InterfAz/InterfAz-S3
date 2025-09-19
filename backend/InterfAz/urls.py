@@ -19,20 +19,25 @@ from django.urls import path,include
 from starcoder import views
 from ollama import views as ollamaViews
 from html_renderizer import views as htmlViews
+from authentification import views as authViews
+
 
 from .views import home
 from .views import axios_connection
 from .views import get_csrf_token
+from gemini import views as gemini_views
 from rest_framework import routers
 from rest_framework.documentation import include_docs_urls
+from rest_framework_simplejwt import views as jwt_views
+
 
 router = routers.DefaultRouter()
-router.register(f'Renderizer', htmlViews.RenderizerView, 'Renderizer')
+router.register(f'renderizer', htmlViews.RenderizerView, 'renderizer')
 
 urlpatterns = [
     #API for forntend 
     path('api/v1/', include(router.urls)),
-    path('docs/', include_docs_urls(title="Renderizer API")),
+    path('docs/', include_docs_urls(title="renderizer API")),
     #URL from Djgango's templates
     path('admin/', admin.site.urls),
     path("ask/starcoder", views.prompt_view, name="prompt_view"),
@@ -47,6 +52,25 @@ urlpatterns = [
     path('delete_html/<int:html_id>/', htmlViews.delete_html, name='delete_html'),
     path('axios_connection', axios_connection, name='connection'),
     path('get_csrf/', get_csrf_token),
+    
+    #URL Login and lOGOUT
+    path('token/', jwt_views.TokenObtainPairView.as_view(), name ='token_obtain_pair'),
+    path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name ='token_refresh'),
+    path('home/', authViews.HomeView.as_view(), name ='home'),
+    path('logout/', authViews.LogoutView.as_view(), name ='logout'),
+    path('private/', authViews.PrivateView.as_view(), name='private'),
+
+
+    #User registration
+    path('signup/',authViews.SignupView.as_view(), name='auth_signup'),
+    path('password/reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+
+    #Ask Gemini
+    path('api/gemini_query/', gemini_views.gemini_query, name='gemini_query'),
+
+
+
+
 
 
 

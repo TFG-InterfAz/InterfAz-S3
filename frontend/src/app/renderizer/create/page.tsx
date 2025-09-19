@@ -1,22 +1,74 @@
 'use client';
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import api from '../../lib/api';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
 import '../../styles.css';
 import Image from "next/image";
 
-
-const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
-
-export default function VolunteerForm() {
+export default function CreateForm() {
   const router = useRouter();
 
   const [title, setTitle] = useState('');
   const [prompt, setPrompt] = useState('');
   const [html_code, setHtml_code] = useState('');
   const [ai, setAI] = useState('');
+  const [showForm, setShowForm] = useState(true);
+
+  // Extraemos HTML desde los bloques ```html
+  const extractHtml = (text: string) => {
+    const match = text.match(/```html\s*([\s\S]*?)```/);
+    return match ? match[1] : text;
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      toast.error("You must be logged in to view this page.");
+      setShowForm(false);
+      setTimeout(() => {
+        router.push("/authentication/login");
+      }, 5000);
+    }
+
+    const storedPrompt = localStorage.getItem('renderizer_prompt');
+    const storedHtml = localStorage.getItem('renderizer_html');
+
+    if (storedPrompt) setPrompt(storedPrompt);
+    if (storedHtml) setHtml_code(extractHtml(storedHtml));
+    if (storedPrompt || storedHtml) setAI('GE');
+
+    // Limpiamos localStorage
+    if (storedPrompt) localStorage.removeItem('renderizer_prompt');
+    if (storedHtml) localStorage.removeItem('renderizer_html');
+  }, []);
+
+  // Generamos código con Gemini
+  const handleGenerateWithGemini = async () => {
+    if (!prompt) return toast.error("Prompt is mandatory");
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}api/gemini_query/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to connect to Gemini");
+      }
+
+      const data = await response.json();
+      const htmlOnly = extractHtml(data.response || "");
+      setHtml_code(htmlOnly);
+      setAI('GE');
+      toast.success("Code generated successfully from Gemini");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error generating code from Gemini");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,11 +81,12 @@ export default function VolunteerForm() {
     const RenderizerData = new FormData();
     RenderizerData.append('title', title);
     RenderizerData.append('prompt', prompt);
-    RenderizerData.append('code', html_code);
-    RenderizerData.append('model', ai);
+    RenderizerData.append('html_code', html_code);
+    RenderizerData.append('ai', ai);
+
 
     try {
-      await axios.post(`${API_ENDPOINT}Renderizer/`, RenderizerData);
+      await api.post("/api/v1/renderizer/", RenderizerData);
       toast.success('Instance created successfully');
       router.push('/renderizer');
     } catch (error: any) {
@@ -61,68 +114,79 @@ export default function VolunteerForm() {
         priority
       />
 
-      {/* Create Section */}
-      <div className='form-wrapper'>
-        <form onSubmit={handleSubmit} className='volunteer-form'>
-          <div className='form-header-inner'>
-            <h2 className='form-title'>Instance Creation</h2>
-            <p className='form-description'>Please fill this form in order to create a new instance</p>
-          </div>
+      {showForm && (
+        <div className='form-wrapper'>
+          <form onSubmit={handleSubmit} className='volunteer-form'>
+            <div className='form-header-inner'>
+              <h2 className='form-title'>Instance Creation</h2>
+              <p className='form-description'>Please fill this form in order to create a new instance</p>
+            </div>
 
-          <div className='form-group'>
-            <label className='form-label'>Title</label>
-            <input
-              value={title}
-              type='text'
-              placeholder='Write a title'
-              className='form-input'
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
+            <div className='form-group'>
+              <label className='form-label'>Title</label>
+              <input
+                value={title}
+                type='text'
+                placeholder='Write a title'
+                className='form-input'
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
 
-          <div className='form-group'>
-            <label className='form-label'>Prompt</label>
-            <textarea
-              value={prompt}
-              placeholder='Write a prompt'
-              className='form-textarea'
-              rows={4}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
-          </div>
+            <div className='form-group'>
+              <label className='form-label'>Prompt</label>
+              <textarea
+                value={prompt}
+                placeholder='Write a prompt'
+                className='form-textarea'
+                rows={4}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+              <button
+                type="button"
+                className="submit-button"
+                style={{ marginTop: '10px', width: '50%', marginLeft: '25%', marginRight: '25%' }}
+                onClick={handleGenerateWithGemini}
+              >
+                Generate with Gemini
+              </button>
+            </div>
 
-          <div className='form-group'>
-            <label className='form-label'>HTML Code</label>
-            <textarea
-              value={html_code}
-              placeholder='Write your HTML code'
-              className='form-textarea code-textarea'
-              rows={6}
-              onChange={(e) => setHtml_code(e.target.value)}
-            />
-          </div>
+            <div className='form-group'>
+              <label className='form-label'>HTML Code</label>
+              <textarea
+                value={html_code}
+                placeholder='Write your HTML code or generate it'
+                className='form-textarea code-textarea'
+                rows={6}
+                onChange={(e) => setHtml_code(e.target.value)}
+              />
+            </div>
 
-          <div className='form-group'>
-            <label className='form-label'>AI Model</label>
-            <select
-              value={ai}
-              className='form-select'
-              onChange={(e) => setAI(e.target.value)}
-            >
-              <option value="">Select an AI model</option>
-              <option value="gpt-4">OPENAI</option>
-              <option value="gpt-3.5-turbo">Ollama</option>
-              <option value="claude">Claude</option>
-              <option value="gemini">DeepSeek</option>
-              <option value="gemini">Cursor</option>
-            </select>
-          </div>
+            <div className='form-group'>
+              <label className='form-label'>AI Model</label>
+              <select
+                value={ai}
+                className='form-select'
+                onChange={(e) => setAI(e.target.value)}
+              >
+                <option value="">Select an AI model</option>
+                <option value="OP">OPENAI</option>
+                <option value="OL">Ollama</option>
+                <option value="CE">Claude</option>
+                <option value="GE">Gemini</option>
+                <option value="DK">DeepSeek</option>
+                <option value="CS">Cursor</option>
+                <option value="SC">StarCoder</option>
+              </select>
+            </div>
 
-          <button type='submit' className='submit-button'>
-            <span className='button-text'>Create Instance</span>
-          </button>
-        </form>
-      </div>
+            <button type='submit' className='submit-button'>
+              <span className='button-text'>Create Instance</span>
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
